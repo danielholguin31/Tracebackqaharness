@@ -582,10 +582,10 @@ export function JourneyDetail({ id }: { id: string }) {
           .traceback/journeys/{j.id}/journey.json · revision {j.revision}
         </code>
         <Link
-          href={"/operator?journey=" + encodeURIComponent(id)}
+          href={"/?journey=" + encodeURIComponent(id)}
           className="btn-precision btn-secondary"
         >
-          Ask Operator
+          Ask agent
         </Link>
       </div>
       <div className="journey-tabs" role="tablist">

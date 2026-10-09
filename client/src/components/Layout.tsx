@@ -1,3 +1,4 @@
+import { WorkspaceShellContext } from '@/contexts/WorkspaceShellContext';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { PersonalWorkspaceLayout } from '@/layouts/PersonalWorkspaceLayout';
@@ -695,14 +696,19 @@ export function AskOperatorPanel({ onClose, onMinimize, onExpand, pageContext }:
 // ─── Layout ──────────────────────────────────────────────
 
 export function urlFallbackContext(location: string): PageContextEntry | null {
-  if (location === "/")                          return { label: "Overview",        context: "Viewing the workspace Overview dashboard." };
+  if (location === "/overview")                  return { label: "Overview",        context: "Viewing the workspace Overview dashboard." };
   if (location === "/runs")                      return { label: "Runs",            context: "Viewing the Runs list." };
   if (location === "/issues")                    return { label: "Issues",          context: "Viewing the Issues list." };
   if (location === "/tests")                     return { label: "Tests",           context: "Viewing the Test Definitions library." };
   if (location === "/suites")                    return { label: "Suites",          context: "Viewing the Suites list." };
   if (location === "/settings")                  return { label: "Settings",        context: "Viewing workspace Settings." };
   if (location === "/events")                    return { label: "Events",          context: "Viewing the Events list." };
-  if (location === "/operator")                  return null;
+  if (location === "/operator" || location === "/" || location.startsWith("/chats")) return null;
+  if (location === "/journeys") return { label: "User journeys", context: "Viewing the canonical user journey library. Use .traceback definitions and actual run evidence; fetch current records before making claims." };
+  if (location.startsWith("/journeys/")) return { label: "Journey", context: `Viewing a canonical journey or route map at ${location}. Fetch the referenced canonical definition or map and its actual evidence.` };
+  if (location === "/ontology") return { label: "Ontology", context: "Viewing the product ontology. Fetch the current canonical ontology before proposing changes." };
+  if (location === "/ux") return { label: "UX evidence", context: "Viewing UX evidence. Analyze actual observations and distinguish synthetic findings from human validation." };
+  if (location.startsWith("/personal")) return { label: "Project workspace", context: `Viewing ${location}. Keep evidence and actions scoped to the project referenced in this URL.` };
   if (location.startsWith("/runs/live"))         return { label: "Live Run",        context: "Watching a live test run in progress." };
   if (location.startsWith("/runs/initializing")) return { label: "Run Starting",    context: "A test run is initializing." };
   if (location.startsWith("/runs/"))             return { label: "Run Report",      context: `Viewing a run report (URL: ${location}).` };
@@ -711,7 +717,7 @@ export function urlFallbackContext(location: string): PageContextEntry | null {
   if (location.startsWith("/suites/runs/"))      return { label: "Suite Run",       context: `Viewing a suite run report (URL: ${location}).` };
   if (location.startsWith("/suites/"))           return { label: "Suite",           context: `Viewing a suite detail page (URL: ${location}).` };
   if (location.startsWith("/events/"))           return { label: "Event",           context: `Viewing an event detail (URL: ${location}).` };
-  return null;
+  return { label: "Workspace view", context: `Viewing ${location}. Fetch current workspace records before making claims or taking action.` };
 }
 
 export function Layout({ children, noScroll }: { children: React.ReactNode; noScroll?: boolean }) {
@@ -722,10 +728,12 @@ export function Layout({ children, noScroll }: { children: React.ReactNode; noSc
   const project = useQuery({queryKey:['personal-project',projectId],queryFn:()=>personal.getProject(projectId),enabled:!!projectId});
   const { popupOpen, popupMounted, setPopupOpen, setPopupMounted, setPopupView } = useContext(OperatorPageContext);
 
+  const embedded = useContext(WorkspaceShellContext);
+  if (embedded) return <div className={cn("min-h-0 flex-1", noScroll ? "h-full overflow-hidden flex flex-col" : "min-h-full")}>{children}</div>;
   if (projectId) return <PersonalWorkspaceLayout project={{id:projectId,name:project.data?.name||'Project',color:project.data?.color||'#888888'}}>{children}</PersonalWorkspaceLayout>;
   return (
     <div className="v2-team-layout flex h-screen w-full bg-background overflow-hidden text-foreground selection:bg-white/20 selection:text-foreground">
-      <Sidebar />
+      <Sidebar mode="gui" onModeChange={() => window.location.assign("/")} />
       <nav className="v2-mobile-nav" aria-label="Workspace navigation" style={{display:"none",gap:16,padding:"12px 16px",overflowX:"auto",borderBottom:"1px solid hsl(var(--border))",fontSize:12}}>{[["/","Overview"],["/journeys","Journeys"],["/ux","UX"],["/operator","Operator"],["/tests","Tests"],["/runs","Runs"],["/suites","Suites"],["/issues","Issues"],["/personal","Projects"],["/settings","Settings"]].map(([href,label]) => <a key={href} href={href}>{label}</a>)}</nav>
       <main
         className="flex-1 relative flex flex-col min-w-0 bg-[hsl(var(--sidebar-bg))]"

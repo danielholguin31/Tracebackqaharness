@@ -56,7 +56,7 @@ for (const route of [
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto(route);
-    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("h1:visible")).toBeVisible();
     await page.waitForTimeout(150);
     expect(errors).toEqual([]);
     expect(
@@ -148,7 +148,7 @@ test("run a canonical mobile profile and inspect actual UX evidence", async ({
   );
   await expect(page.locator("body")).toContainText("mobile · passed");
   await expect(
-    page.getByRole("link", { name: "Ask Operator" }),
+    page.getByRole("link", { name: "Ask agent" }),
   ).toHaveAttribute("href", /journey=qa-canonical/);
 });
 test("source discovery and ontology edits have real save and validation behavior", async ({

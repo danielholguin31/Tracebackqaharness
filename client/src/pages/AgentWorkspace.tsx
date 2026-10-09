@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Link } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Layout } from "@/components/Layout";
@@ -947,7 +947,7 @@ function CustomComponentCard({ data }: { data: CustomComponentData }) {
           <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{data.title}</p>
         </div>
       )}
-      <IntelligentArtifact html={data.html} title={data.title || 'Operator artifact'} />
+      <IntelligentArtifact html={data.html} title={data.title || 'Agent artifact'} />
     </div>
   );
 }
@@ -2126,7 +2126,7 @@ function ArtifactPanel({ artifact, onClose, width, onWidthChange }: ArtifactPane
 // ─── Composer ────────────────────────────────────────────
 
 const ACTIONS: { value: ActionType; hint: string }[] = [
-  { value: "Auto",        hint: "Let Operator decide" },
+  { value: "Auto",        hint: "Let the agent decide" },
   { value: "Ask",         hint: "Get an answer" },
   { value: "Run",         hint: "Execute a test or flow" },
   { value: "Create Test", hint: "Draft a new test" },
@@ -2166,7 +2166,7 @@ export function OperatorComposer({ onSend, autoFocus, fillRef, slashDown, pageCo
   const [action, setAction] = useState<ActionType>("Auto");
   const [model, setModel] = useState<ModelMode>("Fast");
   const [askMode, setAskMode] = useState<AskMode>(() => {
-    try { return (localStorage.getItem("operator-ask-mode") as AskMode) || "Approval"; } catch { return "Approval"; }
+    try { return (localStorage.getItem("operator-ask-mode") as AskMode) || "Auto"; } catch { return "Auto"; }
   });
   const [skills, setSkills] = useState<any[]>([]);
   const [linkedContexts, setLinkedContexts] = useState<{ label: string; context: string }[]>([]);
@@ -2407,7 +2407,7 @@ export function OperatorComposer({ onSend, autoFocus, fillRef, slashDown, pageCo
           value={value}
           onChange={e => { handleChange(e.target.value); e.currentTarget.style.height = "auto"; e.currentTarget.style.height = Math.min(e.currentTarget.scrollHeight, 200) + "px"; }}
           onKeyDown={handleKey}
-          placeholder="Ask Operator anything… or type / for commands"
+          placeholder="Give your agent a QA goal… or type / for commands"
           rows={3}
           style={{ minHeight: "72px", maxHeight: "200px" }}
           className="w-full resize-none px-4 pt-3 pb-1 text-[13px] bg-transparent focus:outline-none text-foreground placeholder:text-muted-foreground"
@@ -2633,8 +2633,8 @@ function OperatorSettingsPanel({ open, onClose }: { open: boolean; onClose: () =
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 shrink-0">
             <div>
-              <p className="text-[13px] font-semibold text-foreground">Operator settings</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">How Operator behaves with you</p>
+              <p className="text-[13px] font-semibold text-foreground">Agent settings</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">How your agent works</p>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-[6px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
               <X className="w-3.5 h-3.5" />
@@ -2786,143 +2786,29 @@ interface HomeViewProps {
   onStartChat: (content: string, action: ActionType, meta: { autonomyPreset: string; model: string; pageContexts?: string[] }) => void;
   history?: HistoryItem[];
   currentPageLabel?: string | null;
+  onDismissContext?: () => void;
 }
 
 const SUGGESTIONS = [
-  { icon: Play,        label: "Run a test",    prompt: "Run the checkout flow test on staging" },
+  { icon: Play,        label: "Run a journey", prompt: "List my canonical journeys and help me choose one to run." },
   { icon: AlertCircle, label: "Review issues", prompt: "What are the most critical open issues right now?" },
-  { icon: Plus,        label: "Create a test", prompt: "/test " },
-  { icon: BarChart2,   label: "Show trends",   prompt: "Visualize pass rate over the last 7 days" },
+  { icon: Plus,        label: "Map an application", prompt: "Help me map an application into canonical user journeys. Ask for the application URL." },
+  { icon: BarChart2,   label: "Review UX evidence", prompt: "Analyze actual journey evidence for friction and explain which observations need human validation." },
 ];
 
-function HomeView({ onOpenChat, onStartChat, history: historyProp, currentPageLabel }: HomeViewProps) {
-  const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState(false);
+function HomeView({ onStartChat, currentPageLabel, onDismissContext }: HomeViewProps) {
   const fillRef = useRef<((v: string) => void) | null>(null);
-
-  const historyData = historyProp ?? [];
-  const related = currentPageLabel
-    ? historyData.filter(h => h.pageLabel === currentPageLabel)
-    : [];
-  const allFiltered = historyData.filter(h =>
-    h.title.toLowerCase().includes(query.toLowerCase())
-  );
-  const restFiltered = allFiltered.filter(h => !currentPageLabel || h.pageLabel !== currentPageLabel);
-  const visible = query ? restFiltered : restFiltered.slice(0, expanded ? 7 : 3);
-  const hasMore = !query && !expanded && restFiltered.length > 3;
-
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center min-h-full py-16 px-6">
-      <div className="w-full flex flex-col items-center relative top-[30px]">
-      {/* Greeting */}
-      <div className="flex flex-col items-center gap-2 mb-8 text-center">
-        <h1 className="text-[24px] font-semibold text-foreground leading-tight">Good morning, Diego</h1>
-        <p className="text-[13px] text-muted-foreground">What do you want to do today?</p>
+  return <div className="flex min-h-full flex-col items-center justify-center px-6 py-16">
+    <div className="w-full max-w-[760px]">
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-semibold leading-tight">What should we test?</h1>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">Describe a goal. Your agent can map journeys, run checks, and investigate the evidence.</p>
       </div>
-
-      {/* Composer */}
-      <div className="w-full max-w-[760px]">
-        <OperatorComposer onSend={onStartChat} autoFocus fillRef={fillRef} slashDown />
-      </div>
-
-      {/* Suggestion chips */}
-      <div className="flex flex-wrap justify-center gap-2 mt-3">
-        {SUGGESTIONS.map(s => (
-          <button
-            key={s.label}
-            onClick={() => fillRef.current?.(s.prompt)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-[7px] border border-border/50 bg-muted/20 hover:bg-muted/40 hover:border-border/80 transition-colors text-[12px] text-foreground"
-          >
-            <s.icon className="w-3 h-3 text-muted-foreground shrink-0" />
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* History */}
-      <div className="w-full max-w-[760px] mt-10">
-        {/* "On this page" section */}
-        {related.length > 0 && !query && (
-          <div className="mb-4">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2 px-1">On this page</p>
-            <div className="space-y-0.5">
-              {related.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => onOpenChat(item)}
-                  className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-[8px] hover:bg-accent/10 transition-colors group border border-accent/10"
-                >
-                  <div className="w-5 h-5 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
-                    <Command className="w-2.5 h-2.5 text-accent" />
-                  </div>
-                  <span className="flex-1 text-[13px] text-foreground truncate">{item.title}</span>
-                  <span className="text-[11px] text-muted-foreground shrink-0">{item.time}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Header row */}
-        <div className="flex items-center justify-between mb-3 px-1">
-          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-            Recent conversations
-          </p>
-        </div>
-
-        {/* Search bar */}
-        <div className="relative mb-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-          <input
-            value={query}
-            onChange={e => { setQuery(e.target.value); setExpanded(false); }}
-            placeholder="Search conversations…"
-            className="w-full bg-muted/30 border border-border/50 rounded-[8px] pl-8 pr-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border/80 transition-colors"
-          />
-          {query && (
-            <button onClick={() => setQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* List */}
-        <div className={cn("space-y-0.5 pr-1", expanded && "max-h-[252px] overflow-y-auto custom-scrollbar")}>
-          {visible.length === 0 ? (
-            <p className="text-[13px] text-muted-foreground px-3 py-4 text-center">No conversations found</p>
-          ) : (
-            visible.map(item => (
-              <button
-                key={item.id}
-                onClick={() => onOpenChat(item)}
-                className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-[8px] hover:bg-muted/40 transition-colors group"
-              >
-                <div className="w-5 h-5 rounded-full bg-muted/60 border border-border/30 flex items-center justify-center shrink-0">
-                  <Command className="w-2.5 h-2.5 text-muted-foreground" />
-                </div>
-                <span className="flex-1 text-[13px] text-foreground truncate">{item.title}</span>
-                <span className="text-[11px] text-muted-foreground shrink-0">{item.time}</span>
-                {item.messageCount !== undefined && item.messageCount > 0 && (
-                  <span className="text-[10px] text-muted-foreground/40 ml-1">{item.messageCount}</span>
-                )}
-              </button>
-            ))
-          )}
-        </div>
-
-        {(hasMore || expanded) && (
-          <button
-            onClick={() => setExpanded(v => !v)}
-            className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[12px] text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors border border-border/40 hover:border-border/70"
-          >
-            <ChevronDown className={cn("w-3 h-3 transition-transform", expanded && "rotate-180")} />
-            {expanded ? "Show less" : `${restFiltered.length - 3} more conversations`}
-          </button>
-        )}
-      </div>
-      </div>
+      <OperatorComposer onSend={onStartChat} fillRef={fillRef} slashDown pageContextLabel={currentPageLabel} onDismissContext={onDismissContext}/>
+      <div className="mt-4 flex flex-wrap justify-center gap-2">{SUGGESTIONS.map(s=><button key={s.label} onClick={()=>fillRef.current?.(s.prompt)} className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted"><s.icon size={13} className="text-muted-foreground"/>{s.label}</button>)}</div>
+      <p className="mt-8 text-center text-xs leading-5 text-muted-foreground">Journeys live in .traceback. Every finding links back to observed evidence.</p>
     </div>
-  );
+  </div>;
 }
 
 // ─── Chat view ───────────────────────────────────────────
@@ -3145,31 +3031,23 @@ function ChatView({ title, messages, artifact, onBack, onSend, onOpenArtifact, o
 
 // ─── Page ────────────────────────────────────────────────
 
-export default function Operator() {
+export default function AgentWorkspace() {
+  const [location, navigate] = useLocation();
+  const search = useSearch();
   const [view, setView] = useState<"home" | "chat">("home");
+  const [draftVersion, setDraftVersion] = useState(0);
   const [chatTitle, setChatTitle] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [artifact, setArtifact] = useState<Artifact | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [sessions, setSessions] = useState<HistoryItem[]>([]);
   const [pendingContextLabel, setPendingContextLabel] = useState<string | null>(null);
   const [pendingContextContent, setPendingContextContent] = useState<string | null>(null);
   const streamAbortRef = useRef<AbortController | null>(null);
-  useEffect(()=>{const journey=new URLSearchParams(window.location.search).get('journey');if(journey){setPendingContextLabel(`Journey: ${journey}`);setPendingContextContent(`Review canonical journey ${journey}. Fetch it with get_canonical_journey and analyze its actual evidence. .traceback is the source of truth.`);}},[]);
+  useEffect(()=>{const journey=new URLSearchParams(search).get('journey');if(journey){setPendingContextLabel(`Journey: ${journey}`);setPendingContextContent(`Review canonical journey ${journey}. Fetch it with get_canonical_journey and analyze its actual evidence. .traceback is the source of truth.`);}},[search, location]);
 
-  // Load sessions list on mount
+  // Resume sessions and context from existing workspace links
   useEffect(() => {
-    operatorApi.sessions().then(list => {
-      setSessions(list.map((s: any) => ({
-        id: s.id,
-        title: s.title || 'New conversation',
-        time: timeAgo(s.updatedAt || s.createdAt),
-        messageCount: s.messageCount,
-        pageLabel: s.pageLabel ?? null,
-      })));
-    }).catch(() => {/* fallback to HISTORY mock */});
-
     // Resume session started from the popup widget
     const pendingId = localStorage.getItem("operatorPendingSession");
     if (pendingId) {
@@ -3188,7 +3066,7 @@ export default function Operator() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const enterChat = () => { setView("chat"); window.dispatchEvent(new Event("operator-chat-open")); };
+  const enterChat = () => { setView("chat"); };
 
   const openChat = useCallback(async (item: HistoryItem) => {
     setChatTitle(item.title);
@@ -3197,6 +3075,7 @@ export default function Operator() {
     try {
       const session = await operatorApi.getSession(item.id);
       setSessionId(item.id);
+      setChatTitle(session.title || item.title);
       setMessages((session.messages ?? []).map((m: any) => ({
         id: m.id,
         role: m.role as "user" | "operator",
@@ -3204,11 +3083,17 @@ export default function Operator() {
         components: m.components ?? [],
       })));
     } catch {
-      setMessages([]);
+      setChatTitle("Conversation unavailable");
+      setMessages([{id:"session-error",role:"operator",content:"This conversation could not be loaded. Choose another chat or start a new one."}]);
       setSessionId(item.id);
     }
     enterChat();
   }, []);
+
+  useEffect(() => {
+    const id = location.match(/^\/chats\/([^/]+)$/)?.[1];
+    if (id && id !== sessionId) { streamAbortRef.current?.abort(); void openChat({id,title:"Conversation",time:""}); }
+  }, [location, openChat, sessionId]);
 
   const startChat = useCallback(async (content: string, _action: ActionType, meta?: { autonomyPreset: string; model: string; pageContexts?: string[] }) => {
     const title = content.length > 60 ? content.slice(0, 57) + "…" : content;
@@ -3220,11 +3105,11 @@ export default function Operator() {
     try {
       const session = await operatorApi.createSession(title, pendingContextLabel ?? undefined);
       sid = session.id;
-      setSessions(prev => [{ id: sid, title, time: "just now", pageLabel: pendingContextLabel ?? null }, ...prev]);
     } catch {
       sid = `local_${Date.now()}`;
     }
     setSessionId(sid);
+    if (!sid.startsWith("local_")) navigate(`/chats/${sid}`);
 
     const userMsg: Message = { id: `u_${Date.now()}`, role: "user", content };
     const streamMsgId = `op_${Date.now()}`;
@@ -3262,7 +3147,6 @@ export default function Operator() {
       },
       onDone: () => {
         setMessages(prev => prev.map(m => m.id === streamMsgId ? { ...m, streaming: false } : m));
-        setSessions(prev => prev.map(s => s.id === sid ? { ...s, title } : s));
       },
       onError: (msg) => {
         setMessages(prev => prev.map(m => m.id === streamMsgId ? { ...m, content: m.content || `Error: ${msg}`, streaming: false } : m));
@@ -3320,12 +3204,25 @@ export default function Operator() {
   const goHome = () => {
     streamAbortRef.current?.abort();
     setView("home");
+    setDraftVersion(v => v + 1);
     setMessages([]);
     setArtifact(null);
     setSessionId(null);
+    navigate("/");
   };
 
-  const historyItems = sessions;
+  useEffect(() => {
+    const newChat = () => { goHome(); setChatTitle(""); setPendingContextLabel(null); setPendingContextContent(null); };
+    const context = () => {
+      setPendingContextLabel(localStorage.getItem("operatorPendingPageContext"));
+      setPendingContextContent(localStorage.getItem("operatorPendingPageContextContent"));
+      localStorage.removeItem("operatorPendingPageContext"); localStorage.removeItem("operatorPendingPageContextContent");
+    };
+    window.addEventListener('traceback:new-chat',newChat);
+    window.addEventListener('traceback:agent-context',context);
+    return () => { window.removeEventListener('traceback:new-chat',newChat); window.removeEventListener('traceback:agent-context',context); };
+  }, []);
+  useEffect(() => () => streamAbortRef.current?.abort(), []);
 
   return (
     <Layout noScroll>
@@ -3334,11 +3231,12 @@ export default function Operator() {
           <div className="flex-1 overflow-y-auto custom-scrollbar relative">
             <button
               onClick={() => setSettingsOpen(true)}
+              aria-label="Agent settings"
               className="absolute top-4 right-5 z-30 p-1.5 rounded-[7px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             >
               <Settings className="w-4 h-4" />
             </button>
-            <HomeView onOpenChat={openChat} onStartChat={startChat} history={historyItems} currentPageLabel={pendingContextLabel} />
+            <HomeView key={draftVersion} onOpenChat={openChat} onStartChat={startChat} currentPageLabel={pendingContextLabel} onDismissContext={() => { setPendingContextLabel(null); setPendingContextContent(null); }} />
           </div>
         ) : (
           <ChatView

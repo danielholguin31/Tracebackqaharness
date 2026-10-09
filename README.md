@@ -2,7 +2,9 @@
 
 Canonical QA intent in `.traceback`, exposed primarily through MCP and CLI, with a responsive investigation workspace and real [Steel Browser](https://github.com/steel-dev/steel-browser) execution.
 
-Each user journey has its own versioned folder. A shared ontology describes actors, entities, routes, and relationships. The GUI, CLI, MCP, and Operator use the same definitions and services. Runs preserve the exact definition revision/hash and synthetic profile used; screenshots and logs remain runtime evidence, not another source of intent.
+The app opens on the agent workspace at `/`. The sidebar switches between Chats (saved conversations) and GUI (journeys, ontology, evidence, runs, issues, and settings). The agent remains mounted while inspecting GUI views, preserving active conversations and drafts. “Ask agent about this view” passes the current view context into the conversation. The overview lives at `/overview`; existing `/operator` links open the agent workspace.
+
+Each user journey has its own versioned folder. A shared ontology describes actors, entities, routes, and relationships. The agent workspace, GUI, CLI, and MCP use the same definitions and services. Runs preserve the exact definition revision/hash and synthetic profile used; screenshots and logs remain runtime evidence, not another source of intent.
 
 ![Canonical Traceback journeys](docs/screenshots/journeys.png)
 
@@ -35,14 +37,14 @@ MCP supports stdio and authenticated stateless Streamable HTTP at `/api/mcp`. It
 - **Journeys:** versioned goals, expected outcomes, steps, actors, routes, provenance, and optimistic saves. Existing definitions refuse stale overwrites.
 - **Mapping:** inspect local source or configured GitHub routes, traverse bounded same-origin links with Steel, review screenshots and controls, import draft reachability checks, or infer unverified business journey hypotheses with AI. Mapping does not prove complete business coverage.
 - **UX evidence:** run standard, mobile, first-time, or keyboard synthetic profiles. Review actual failures, long observation intervals, repeated interactions, and stale revisions. Synthetic observations are not human satisfaction or conversion metrics.
-- **Operator:** investigate actual workspace and canonical evidence conversationally. Rich artifacts use a sandboxed OpenIntelligentUI-derived renderer rather than host HTML injection. Host controls validate follow-up/link actions.
+- **Agent workspace:** investigate actual workspace and canonical evidence conversationally. Rich artifacts use a sandboxed OpenIntelligentUI-derived renderer rather than host HTML injection. Host controls validate follow-up/link actions.
 - **Execution:** autonomous or deterministic browser runs, multiple viewports, sequential suites, screenshots, timelines, reports, issue evidence, pause/resume without replay, budget extension, cancellation, and reviewed selector repair.
 - **GitHub:** publish canonical journey folders and ontology through a new branch and PR. Runtime evidence and secrets are excluded. Actual issue export also supports configured GitHub and Linear.
 - **Autofix:** prepare a Congruence code-edit/retest/draft-PR workflow from an observed failed canonical journey. Live code editing is not enabled without an agreed adapter. See [the contract and repair gates](docs/autofix.md).
 
 ## Configuration and production
 
-Autonomous execution, Operator, natural-language steps, and workflow inference require `OPENAI_API_KEY`. Explicit deterministic steps, mapping, ontology, search, CLI/MCP, and rule-based UX analysis work without an AI key. Missing dependencies produce blocked runs or explicit unavailable responses.
+Autonomous execution, agent chat, natural-language steps, and workflow inference require `OPENAI_API_KEY`. Explicit deterministic steps, mapping, ontology, search, CLI/MCP, and rule-based UX analysis work without an AI key. Missing dependencies produce blocked runs or explicit unavailable responses.
 
 `TRACEBACK_ROOT` selects the canonical folder; `TRACEBACK_REPO_ROOT` selects the local source checkout to inspect. `GITHUB_TOKEN` and `GITHUB_REPOSITORY=owner/repo` enable remote route discovery, journey PRs, and issue export. Linear issue export uses `LINEAR_API_KEY` and `LINEAR_TEAM_ID`. Keep credentials in environment secrets, never canonical files. Stored browser credentials are encrypted; workspace API keys are hashed, shown once, and revocable.
 

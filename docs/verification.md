@@ -40,3 +40,9 @@ A full pass of 114 browser checks completed before the last four additional chec
 ### Final v2.1 local result, 2026-10-09
 
 All 118 desktop/mobile browser checks passed together after the network stabilized. Frontend/backend/interface TypeScript checks, eight unit/security/MCP/adapter tests, both actual Steel regressions, production Vite compilation, Docker build, and production container startup/authentication smoke checks passed. The CLI was linked and invoked through its installed command; MCP returned actual Steel screenshot PNG content in the isolated journey regression. `npm audit --omit=dev` reported zero runtime vulnerabilities. Live model quality and live GitHub/Linear publication remain unverified without credentials; GitHub and inference contracts are covered by fixture adapters. Congruence execution remains a planned external adapter, as requested.
+
+## Agent workspace, 2026-10-09
+
+The home route is the persistent agent workspace. Chats and GUI are two sidebar modes; saved conversations resume by URL, drafts survive GUI navigation, New chat resets state, and GUI context can be attached or dismissed. Project views share the same shell. The former Operator route is a compatibility alias, with no separate Operator navigation/page.
+
+The expanded 124-check desktop/mobile suite passed 123 checks in one run. A concurrent targeted test process removed the shared trace output directory during the last check; that mobile project-creation check passed in an isolated rerun. The four agent-workspace checks also passed separately after the final context changes. Eight unit/security/MCP/adapter tests, TypeScript checks, and the production build passed. Fresh screenshots show both sidebar modes and mobile navigation. Live model responses remain unverified without OPENAI_API_KEY.
