@@ -1,0 +1,39 @@
+name: Traceback QA
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Start upstream Steel and fixture
+        run: |
+          docker run -d --name steel -p 3000:3000 -p 9223:9223 --add-host host.docker.internal:host-gateway -e DOMAIN=localhost:3000 -e CDP_DOMAIN=localhost:9223 ghcr.io/steel-dev/steel-browser-api@sha256:459919842ab1aac5201e33331fc070a13106edd26d968fc7551adcff334b54cf
+          node scripts/qa-fixture.mjs > /tmp/traceback-fixture.log 2>&1 &
+          npm run dev > /tmp/traceback-app.log 2>&1 &
+          for i in $(seq 1 60); do if curl -fsS http://localhost:3001/api/health && curl -fsS http://localhost:3000/v1/health; then exit 0; fi; sleep 1; done
+          exit 1
+      - run: npm run check
+      - run: npm test
+      - run: node scripts/runner-regression.mjs
+      - run: npm run test:e2e
+      - run: npm run build
+      - name: Verify production container
+        run: |
+          docker build -t traceback-v2:qa .
+          python3 scripts/container-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: qa-evidence
+          path: |
+            playwright-report/
+            test-results/

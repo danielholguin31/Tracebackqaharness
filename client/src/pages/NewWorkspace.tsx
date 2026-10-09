@@ -1,0 +1,2 @@
+import { Link } from 'wouter';
+export default function NewWorkspace(){return <main className="v2-state" style={{minHeight:'100vh'}}><div className="v2-eyebrow">Traceback / workspace</div><h1>Your owner workspace is ready.</h1><p>This self-hosted version supports one owner workspace with multiple projects. Create a project for each application you want to test.</p><Link href="/personal" className="btn-precision btn-primary">Create a project</Link><Link href="/settings">Manage workspace settings</Link></main>;}

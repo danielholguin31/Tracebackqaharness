@@ -1,0 +1,2 @@
+import { Link } from 'wouter';
+export default function NotFound() { return <main className="v2-state" style={{minHeight:'100vh'}}><span className="v2-eyebrow">404 / Traceback</span><h1>This page could not be found.</h1><p>The link may be outdated, or the page may have moved.</p><Link href="/" className="btn-precision btn-primary">Back to workspace</Link><Link href="/personal">View personal projects</Link></main>; }

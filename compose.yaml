@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3001
+      STEEL_BASE_URL: http://steel:3000
+      TRACEBACK_PASSWORD: ${TRACEBACK_PASSWORD:?Set the workspace access password}
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:?Set a stable encryption key}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_REPOSITORY: ${GITHUB_REPOSITORY:-}
+      LINEAR_API_KEY: ${LINEAR_API_KEY:-}
+      LINEAR_TEAM_ID: ${LINEAR_TEAM_ID:-}
+    volumes:
+      - traceback-data:/app/data
+    depends_on:
+      - steel
+  steel:
+    image: ghcr.io/steel-dev/steel-browser-api@sha256:459919842ab1aac5201e33331fc070a13106edd26d968fc7551adcff334b54cf
+    environment:
+      DOMAIN: steel:3000
+      CDP_DOMAIN: steel:9223
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    shm_size: 1gb
+volumes:
+  traceback-data:
