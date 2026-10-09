@@ -18,6 +18,10 @@ import { workspaceRouter } from './routes/workspace';
 import { toolboxRouter } from './routes/toolbox';
 import { personalRouter } from './routes/personal';
 import { usageRouter } from './routes/usage';
+import { journeysRouter } from './routes/journeys';
+import { tracebackStore } from './lib/traceback-store';
+import { recoverMappings } from './lib/journey-mapping';
+import { mcpRouter } from './routes/mcp';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -31,6 +35,8 @@ app.use(express.json());
 installAuth(app);
 await bootstrap();
 await recoverInterruptedRuns();
+await tracebackStore.init();
+await recoverMappings();
 
 app.use('/api/artifacts', express.static(path.resolve('data/artifacts'), { dotfiles: 'deny' }));
 // Health check
@@ -54,6 +60,8 @@ app.use('/api/workspace', workspaceRouter);
 app.use('/api/toolbox', toolboxRouter);
 app.use('/api/personal', personalRouter);
 app.use('/api/usage', usageRouter);
+app.use('/api/journeys', journeysRouter);
+app.use('/api/mcp', mcpRouter);
 
 app.use('/api', (_req, res) => res.status(404).json({ error: 'API route not found' }));
 app.use(express.static(path.resolve('dist')));

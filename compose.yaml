@@ -19,6 +19,7 @@ services:
       LINEAR_TEAM_ID: ${LINEAR_TEAM_ID:-}
     volumes:
       - traceback-data:/app/data
+      - traceback-canonical:/app/.traceback
     depends_on:
       - steel
   steel:
@@ -31,3 +32,4 @@ services:
     shm_size: 1gb
 volumes:
   traceback-data:
+  traceback-canonical:

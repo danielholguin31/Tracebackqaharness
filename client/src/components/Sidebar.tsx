@@ -48,7 +48,6 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 const workspaces = [
   { id: '1', name: "Traceback", type: "Team", color: "bg-[#3b82f6]", initial: "T" },
   { id: '2', name: "Personal", type: "Personal", color: "bg-[#6366f1]", initial: "P" },
-  { id: '3', name: "Acme Corp", type: "Team", color: "bg-[#f97316]", initial: "AC" }
 ];
 
 const tooltipCls = "z-50 text-[11px] px-2 py-1 rounded-[6px] backdrop-blur-md bg-black/[0.07] dark:bg-white/[0.22] border border-black/[0.09] dark:border-white/[0.25] text-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 origin-[--radix-tooltip-content-transform-origin]";
@@ -180,6 +179,8 @@ export function Sidebar() {
   const navItems = [
     { name: "Overview",         path: "/",        icon: LayoutGrid },
     { name: "Operator",         path: "/operator",icon: Command },
+    { name: "User journeys",    path: "/journeys",icon: FileCheck },
+    { name: "UX evidence",      path: "/ux",      icon: Search },
     { name: "Test Definitions", path: "/tests",   icon: FileCheck },
     { name: "Runs",             path: "/runs",    icon: Play,          badge: liveRunsCount },
     { name: "Events",           path: "/events",  icon: GitPullRequest, badge: eventsCount },
@@ -295,7 +296,7 @@ export function Sidebar() {
                         {workspaces.map(ws => (
                           <DropdownMenuItem
                             key={ws.id}
-                            onSelect={e => { e.preventDefault(); setActiveWorkspace(ws.name); setDropdownView('main'); }}
+                            onSelect={e => { e.preventDefault(); if(ws.id==='2')window.location.assign('/personal');else{setActiveWorkspace(ws.name);setDropdownView('main');} }}
                             className="flex items-center gap-3 px-3 py-2.5 rounded-[8px] cursor-pointer hover:bg-muted focus:bg-muted transition-colors outline-none"
                           >
                             <div className={cn("w-7 h-7 rounded-[6px] flex items-center justify-center text-[12px] font-semibold text-white shrink-0", ws.color)}>

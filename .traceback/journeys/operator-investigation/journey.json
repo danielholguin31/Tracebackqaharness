@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "operator-investigation",
+  "name": "Investigate a journey conversationally",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/operator",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Ask the Operator to read a named canonical journey, analyze actual evidence, and present a source-grounded investigation. Do not create or export issues unless explicitly instructed.",
+  "expectedOutcome": "The answer cites actual journey revisions and run IDs; generated HTML remains isolated from host credentials.",
+  "routes": [
+    "/operator"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

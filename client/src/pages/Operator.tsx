@@ -6,6 +6,7 @@ import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
 import { operator as operatorApi, issues as issuesApi, runs as runsApi, tests as testsApi, suites as suitesApi } from "@/lib/api";
 import { sendOperatorMessage } from "@/lib/operatorStream";
+import { IntelligentArtifact } from '@/components/IntelligentArtifact';
 import {
   Command, ArrowUp, X, ChevronDown, Check, Search, Play, Plus, BarChart2, AlertCircle,
   CheckCircle2, XCircle, MinusCircle,
@@ -186,10 +187,7 @@ interface Message {
 }
 
 const TEAM: TeamMember[] = [
-  { id: "me",  name: "Diego H.",  initials: "DH", color: "from-indigo-500 to-purple-500" },
-  { id: "t2",  name: "Sara K.",   initials: "SK", color: "from-emerald-500 to-teal-500"  },
-  { id: "t3",  name: "Marcus T.", initials: "MT", color: "from-orange-400 to-red-500"    },
-  { id: "t4",  name: "Priya N.",  initials: "PN", color: "from-pink-500 to-rose-500"     },
+  { id: "me", name: "Workspace owner", initials: "WO", color: "from-slate-500 to-slate-700" },
 ];
 
 type Artifact =
@@ -949,10 +947,7 @@ function CustomComponentCard({ data }: { data: CustomComponentData }) {
           <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{data.title}</p>
         </div>
       )}
-      <div
-        className="p-4 text-[13px] text-foreground"
-        dangerouslySetInnerHTML={{ __html: data.html }}
-      />
+      <IntelligentArtifact html={data.html} title={data.title || 'Operator artifact'} />
     </div>
   );
 }
@@ -3043,12 +3038,7 @@ function ChatView({ title, messages, artifact, onBack, onSend, onOpenArtifact, o
 
         {/* Invite button */}
         <div ref={inviteRef} className="relative shrink-0">
-          <button
-            onClick={() => setShowInvite(v => !v)}
-            className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground border border-border/50 rounded-[6px] px-2 py-1 hover:bg-muted/50 transition-colors"
-          >
-            <UserPlus className="w-3.5 h-3.5" /> Invite
-          </button>
+          <span className="text-[11px] text-muted-foreground">Owner workspace</span>
           {showInvite && (
             <div className="absolute right-0 top-full mt-1.5 w-52 bg-background border border-border rounded-[10px] shadow-lg overflow-hidden z-30">
               <div className="px-3 py-2 border-b border-border/50">
@@ -3166,6 +3156,7 @@ export default function Operator() {
   const [pendingContextLabel, setPendingContextLabel] = useState<string | null>(null);
   const [pendingContextContent, setPendingContextContent] = useState<string | null>(null);
   const streamAbortRef = useRef<AbortController | null>(null);
+  useEffect(()=>{const journey=new URLSearchParams(window.location.search).get('journey');if(journey){setPendingContextLabel(`Journey: ${journey}`);setPendingContextContent(`Review canonical journey ${journey}. Fetch it with get_canonical_journey and analyze its actual evidence. .traceback is the source of truth.`);}},[]);
 
   // Load sessions list on mount
   useEffect(() => {
@@ -3323,6 +3314,8 @@ export default function Operator() {
       },
     }, ctrl.signal, { ...meta, pageContext: pendingContextContent ?? undefined }).catch(() => {});
   }, [sessionId, startChat, pendingContextContent]);
+
+  useEffect(()=>{const listener=(event:Event)=>{const text=(event as CustomEvent).detail?.text;if(messages.some(m=>m.streaming)){event.preventDefault();return;}if(typeof text==='string'&&text.trim()&&text.length<=4000)handleSend(text,'Ask');};window.addEventListener('traceback:operator-prompt',listener);return()=>window.removeEventListener('traceback:operator-prompt',listener);},[handleSend,messages]);
 
   const goHome = () => {
     streamAbortRef.current?.abort();

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "project-scope",
+  "name": "Keep project evidence scoped",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/personal",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Create a temporary QA project with a disposable base URL, then inspect its tests, runs, issues, suites, settings, and toolbox. Confirm team definitions are excluded from project lists.",
+  "expectedOutcome": "Project lists contain only project-scoped definitions and evidence.",
+  "routes": [
+    "/personal",
+    "/personal/projects/:id",
+    "/personal/projects/:id/tests",
+    "/personal/projects/:id/runs",
+    "/personal/projects/:id/issues",
+    "/personal/projects/:id/suites",
+    "/personal/projects/:id/settings",
+    "/personal/projects/:id/toolbox"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

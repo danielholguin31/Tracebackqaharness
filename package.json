@@ -1,6 +1,6 @@
 {
   "name": "traceback-v2",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -15,7 +15,9 @@
     "start": "tsx server/index.ts",
     "test": "tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "cli": "node bin/traceback.mjs",
+    "mcp": "node bin/traceback.mjs mcp"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",
@@ -25,6 +27,7 @@
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@libsql/client": "^0.17.2",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -57,6 +60,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "commander": "^15.0.0",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dnd-core": "^16.0.1",
@@ -83,6 +87,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.23.15",
     "tw-animate-css": "^1.4.0",
     "vaul": "^1.1.2",
     "wouter": "^3.3.5",
@@ -104,8 +109,10 @@
     "drizzle-kit": "^0.31.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.14",
-    "tsx": "^4.19.4",
     "typescript": "5.6.3",
     "vite": "^7.1.9"
+  },
+  "bin": {
+    "traceback": "bin/traceback.mjs"
   }
 }

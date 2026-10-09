@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "suite-orchestration",
+  "name": "Create and execute a suite",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/suites/new",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Select disposable valid definitions, create a sequential suite, run it, and inspect each viewport result. Do not operate against production targets.",
+  "expectedOutcome": "The suite aggregates actual terminal run results and links to each underlying run.",
+  "routes": [
+    "/suites",
+    "/suites/new",
+    "/suites/:id",
+    "/suites/runs/:id"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

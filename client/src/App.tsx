@@ -38,6 +38,7 @@ import Toolbox from "@/pages/Toolbox";
 import DesignSystem from "@/pages/DesignSystem";
 import Operator from "@/pages/Operator";
 import NewWorkspace from "@/pages/NewWorkspace";
+import { JourneyLibrary,NewJourney,JourneyDetail,RouteMap,Ontology,UXEvidence } from '@/pages/Journeys';
 
 // Single persistent popup instance — lives outside the per-page Layout tree
 function OperatorPopupRoot() {
@@ -76,6 +77,12 @@ function Router() {
     <Switch>
       {/* ── Team workspace ── */}
       <Route path="/" component={Overview}/>
+      <Route path="/journeys" component={JourneyLibrary}/>
+      <Route path="/journeys/new" component={NewJourney}/>
+      <Route path="/journeys/maps/:id">{p=><RouteMap id={p.id}/>}</Route>
+      <Route path="/journeys/:id">{p=><JourneyDetail id={p.id}/>}</Route>
+      <Route path="/ontology" component={Ontology}/>
+      <Route path="/ux" component={UXEvidence}/>
       <Route path="/usage" component={Usage}/>
       <Route path="/events" component={Events}/>
       <Route path="/events/:id" component={EventDetail}/>

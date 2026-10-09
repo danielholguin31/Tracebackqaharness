@@ -10,3 +10,8 @@ test-results/
 .DS_Store
 *.tar.gz
 data/encryption.key
+.traceback/evidence/
+.traceback/.write-lock/
+.traceback/autofix/plans/
+*.tmp
+.traceback/journeys/qa-*/

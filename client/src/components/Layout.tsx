@@ -726,7 +726,7 @@ export function Layout({ children, noScroll }: { children: React.ReactNode; noSc
   return (
     <div className="v2-team-layout flex h-screen w-full bg-background overflow-hidden text-foreground selection:bg-white/20 selection:text-foreground">
       <Sidebar />
-      <nav className="v2-mobile-nav" aria-label="Workspace navigation" style={{display:"none",gap:16,padding:"12px 16px",overflowX:"auto",borderBottom:"1px solid hsl(var(--border))",fontSize:12}}>{[["/","Overview"],["/tests","Tests"],["/runs","Runs"],["/suites","Suites"],["/issues","Issues"],["/personal","Projects"],["/settings","Settings"]].map(([href,label]) => <a key={href} href={href}>{label}</a>)}</nav>
+      <nav className="v2-mobile-nav" aria-label="Workspace navigation" style={{display:"none",gap:16,padding:"12px 16px",overflowX:"auto",borderBottom:"1px solid hsl(var(--border))",fontSize:12}}>{[["/","Overview"],["/journeys","Journeys"],["/ux","UX"],["/operator","Operator"],["/tests","Tests"],["/runs","Runs"],["/suites","Suites"],["/issues","Issues"],["/personal","Projects"],["/settings","Settings"]].map(([href,label]) => <a key={href} href={href}>{label}</a>)}</nav>
       <main
         className="flex-1 relative flex flex-col min-w-0 bg-[hsl(var(--sidebar-bg))]"
         style={{ height: 'calc(100vh - 34px)' }}

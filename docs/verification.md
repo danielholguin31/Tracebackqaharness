@@ -28,3 +28,15 @@ Inherited runtime vulnerabilities were patched, including the Drizzle ORM update
 ## Recorded local result
 
 On 2026-10-09, frontend/backend TypeScript checks, all four unit/security tests, the actual Steel runner regression, all 88 desktop/mobile browser checks, Vite production build, Docker build on Node 22, and the production container startup/authentication smoke check passed. The smoke check caught and verified a fix for non-root file ownership in the image. Live model behavior and third-party exports remain unverified without credentials.
+
+## v2.1 canonical/MCP verification
+
+The expanded verification adds canonical file revisions, stale-write rejection, actor/relation validation, symlink rejection, source and GitHub route discovery, inference provenance and unobserved-route rejection, canonical-only GitHub tree export, actual MCP stdio negotiation, authenticated stateless HTTP MCP, screenshot image content, and the installed CLI entrypoint. The real Steel journey regression uses an isolated database/canonical folder and tests mobile execution, stale UX evidence, failed-run fix planning, bounded mapping, idempotent draft import, and cancellation.
+
+Desktop/mobile browser coverage adds journey routes, guided intent editing, JSON errors, stale saves, actual synthetic execution and UX evidence, source/ontology operations, route map import, unavailable inference, API recovery, evidence search, configured integration controls with fixture responses, and Operator iframe isolation. Tablet/light/dark checks verify no document overflow and measured muted-text contrast. [Anti-slop evidence](anti-slop-verification.md) records the scoped gate and click-through.
+
+A full pass of 114 browser checks completed before the last four additional checks. The first pass of those new checks had one local ERR_NETWORK_CHANGED interruption while Docker altered the network; the complete suite was rerun after container work finished. See the final recorded result below rather than treating the interrupted pass as successful.
+
+### Final v2.1 local result, 2026-10-09
+
+All 118 desktop/mobile browser checks passed together after the network stabilized. Frontend/backend/interface TypeScript checks, eight unit/security/MCP/adapter tests, both actual Steel regressions, production Vite compilation, Docker build, and production container startup/authentication smoke checks passed. The CLI was linked and invoked through its installed command; MCP returned actual Steel screenshot PNG content in the isolated journey regression. `npm audit --omit=dev` reported zero runtime vulnerabilities. Live model quality and live GitHub/Linear publication remain unverified without credentials; GitHub and inference contracts are covered by fixture adapters. Congruence execution remains a planned external adapter, as requested.

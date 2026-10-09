@@ -4,9 +4,11 @@ import {spawn} from 'node:child_process';
 import {mkdtemp,rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import {Client} from '@modelcontextprotocol/sdk/client/index.js';
+import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 test('owner API requires a server session, blocks foreign origins, and accepts only live API keys',async()=>{
  const temp=await mkdtemp(path.join(os.tmpdir(),'traceback-auth-'));
- const child=spawn(process.execPath,['--import','tsx','server/index.ts'],{cwd:process.cwd(),env:{...process.env,NODE_ENV:'production',PORT:'3102',DATABASE_URL:path.join(temp,'qa.db'),TRACEBACK_PASSWORD:'test-only-workspace-password'},stdio:'ignore'});
+ const child=spawn(process.execPath,['--import','tsx','server/index.ts'],{cwd:process.cwd(),env:{...process.env,NODE_ENV:'production',PORT:'3102',DATABASE_URL:path.join(temp,'qa.db'),TRACEBACK_ROOT:path.join(temp,'.traceback'),TRACEBACK_PASSWORD:'test-only-workspace-password'},stdio:'ignore'});
  const base='http://127.0.0.1:3102/api';
  try{
   let ready=false;for(let i=0;i<50;i++){try{if((await fetch(base+'/health')).ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,100));}assert.ok(ready,'Isolated API server started');
@@ -18,6 +20,8 @@ test('owner API requires a server session, blocks foreign origins, and accepts o
   const foreign=await fetch(base+'/workspace',{method:'PATCH',headers:{Cookie:cookie,Origin:'https://untrusted.example','Content-Type':'application/json'},body:JSON.stringify({name:'Changed'})});assert.equal(foreign.status,403);
   const response=await fetch(base+'/workspace/api-keys',{method:'POST',headers:{Cookie:cookie,'Content-Type':'application/json'},body:JSON.stringify({name:'QA key'})});assert.equal(response.status,201);const key:any=await response.json();
   assert.equal((await fetch(base+'/tests',{headers:{Authorization:`Bearer ${key.key}`}})).status,200);
+  const mcp=new Client({name:'http-qa',version:'1'});const transport=new StreamableHTTPClientTransport(new URL(base+'/mcp'),{requestInit:{headers:{Authorization:`Bearer ${key.key}`}}});await mcp.connect(transport);assert.ok((await mcp.listTools()).tools.some(t=>t.name==='list_journeys'));await mcp.close();await transport.close();
+  assert.equal((await fetch(base+'/mcp',{method:'POST',headers:{Cookie:cookie,'Content-Type':'application/json'},body:'{}'})).status,401);
   const listed:any=await fetch(base+'/workspace/api-keys',{headers:{Cookie:cookie}}).then(r=>r.json());assert.ok(listed.every((k:any)=>!k.key&&!k.keyHash));
   assert.equal((await fetch(base+'/workspace/api-keys/'+key.id,{method:'DELETE',headers:{Cookie:cookie}})).status,200);
   assert.equal((await fetch(base+'/tests',{headers:{Authorization:`Bearer ${key.key}`}})).status,401);
