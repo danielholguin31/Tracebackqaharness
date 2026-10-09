@@ -1,8 +1,6 @@
+import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { Switch, Route } from "wouter";
-import { useContext } from "react";
-import { useLocation } from "wouter";
-import { OperatorPageContextProvider, OperatorPageContext } from "@/contexts/OperatorPageContext";
-import { AskOperatorPanel, urlFallbackContext } from "@/components/Layout";
+import { OperatorPageContextProvider } from "@/contexts/OperatorPageContext";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -36,46 +34,20 @@ import Events from "@/pages/Events";
 import EventDetail from "@/pages/EventDetail";
 import Toolbox from "@/pages/Toolbox";
 import DesignSystem from "@/pages/DesignSystem";
-import Operator from "@/pages/Operator";
 import NewWorkspace from "@/pages/NewWorkspace";
-
-// Single persistent popup instance — lives outside the per-page Layout tree
-function OperatorPopupRoot() {
-  const [location, navigate] = useLocation();
-  const { pageContext, popupMounted, setPopupMounted, popupOpen, setPopupOpen } = useContext(OperatorPageContext);
-
-  const effectiveContext = pageContext ?? urlFallbackContext(location);
-
-  const handleExpand = (sessionId: string | null) => {
-    if (sessionId) localStorage.setItem("operatorPendingSession", sessionId);
-    if (effectiveContext) {
-      localStorage.setItem("operatorPendingPageContext", effectiveContext.label);
-      localStorage.setItem("operatorPendingPageContextContent", effectiveContext.context);
-    }
-    setPopupMounted(false);
-    setPopupOpen(false);
-    navigate("/operator");
-  };
-
-  if (!popupMounted || location === "/workspaces/new") return null;
-
-  return (
-    <div className={popupOpen ? "" : "hidden"}>
-      <AskOperatorPanel
-        onClose={() => { setPopupMounted(false); setPopupOpen(false); }}
-        onMinimize={() => setPopupOpen(false)}
-        onExpand={handleExpand}
-        pageContext={effectiveContext}
-      />
-    </div>
-  );
-}
+import { JourneyLibrary,NewJourney,JourneyDetail,RouteMap,Ontology,UXEvidence } from '@/pages/Journeys';
 
 function Router() {
   return (
     <Switch>
       {/* ── Team workspace ── */}
-      <Route path="/" component={Overview}/>
+      <Route path="/overview" component={Overview}/>
+      <Route path="/journeys" component={JourneyLibrary}/>
+      <Route path="/journeys/new" component={NewJourney}/>
+      <Route path="/journeys/maps/:id">{p=><RouteMap id={p.id}/>}</Route>
+      <Route path="/journeys/:id">{p=><JourneyDetail id={p.id}/>}</Route>
+      <Route path="/ontology" component={Ontology}/>
+      <Route path="/ux" component={UXEvidence}/>
       <Route path="/usage" component={Usage}/>
       <Route path="/events" component={Events}/>
       <Route path="/events/:id" component={EventDetail}/>
@@ -98,7 +70,6 @@ function Router() {
       <Route path="/settings" component={Settings}/>
       <Route path="/design-system" component={DesignSystem}/>
       <Route path="/workspaces/new" component={NewWorkspace}/>
-      <Route path="/operator" component={Operator}/>
 
       {/* ── Personal workspace — project sub-routes (must come before /personal) ── */}
       <Route path="/personal/projects/:id/tests">
@@ -149,8 +120,7 @@ function App() {
         <PasswordGate>
           <Toaster />
           <OperatorPageContextProvider>
-            <Router />
-            <OperatorPopupRoot />
+            <WorkspaceShell><Router /></WorkspaceShell>
           </OperatorPageContextProvider>
         </PasswordGate>
       </TooltipProvider>

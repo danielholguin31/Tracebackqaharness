@@ -1,3 +1,5 @@
+import { useContext } from 'react';
+import { WorkspaceShellContext } from '@/contexts/WorkspaceShellContext';
 import { PersonalSidebar } from "@/components/PersonalSidebar";
 import { PersonalTopHeader } from "@/components/PersonalTopHeader";
 
@@ -7,6 +9,8 @@ interface PersonalWorkspaceLayoutProps {
 }
 
 export function PersonalWorkspaceLayout({ children, project }: PersonalWorkspaceLayoutProps) {
+  const embedded = useContext(WorkspaceShellContext);
+  if (embedded) return <div className="min-h-full">{children}</div>;
   return (
     <div className="personal-workspace-layout h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Floating glassmorphism header — fixed over everything */}

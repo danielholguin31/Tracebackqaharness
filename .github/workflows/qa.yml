@@ -24,6 +24,7 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: node scripts/runner-regression.mjs
+      - run: node scripts/journey-regression.mjs
       - run: npm run test:e2e
       - run: npm run build
       - name: Verify production container

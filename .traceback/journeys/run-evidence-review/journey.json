@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "run-evidence-review",
+  "name": "Inspect actual run evidence",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/runs",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Open an existing run and inspect its trace, screenshots, report, and issue tabs. If there is no run, report the empty state instead of inventing one.",
+  "expectedOutcome": "Displayed status and evidence match the selected run. Missing records show an unavailable state.",
+  "routes": [
+    "/runs",
+    "/runs/:id",
+    "/runs/initializing/:id",
+    "/runs/live/autonomous",
+    "/runs/live/deterministic"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

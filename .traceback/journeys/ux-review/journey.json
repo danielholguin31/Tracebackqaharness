@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "ux-review",
+  "name": "Review synthetic UX friction",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/ux",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Open a canonical journey with run evidence. Inspect friction candidates, revision freshness, and source screenshots. If evidence is absent, state that UX findings are unknown.",
+  "expectedOutcome": "Synthetic evidence is distinguished from human satisfaction, conversion, and usability claims.",
+  "routes": [
+    "/ux",
+    "/journeys/:id"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

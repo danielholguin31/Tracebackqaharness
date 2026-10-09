@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "actors": [
+    {
+      "id": "workspace-owner",
+      "name": "Workspace owner",
+      "description": "Authenticated owner authoring and reviewing QA intent"
+    },
+    {
+      "id": "synthetic-browser",
+      "name": "Synthetic browser",
+      "description": "A bounded Steel browser runner, not a human research participant"
+    }
+  ],
+  "entities": [
+    {
+      "id": "journey",
+      "name": "User journey",
+      "description": ""
+    },
+    {
+      "id": "test",
+      "name": "Executable test snapshot",
+      "description": ""
+    },
+    {
+      "id": "run",
+      "name": "Browser run",
+      "description": ""
+    },
+    {
+      "id": "issue",
+      "name": "Observed issue",
+      "description": ""
+    },
+    {
+      "id": "suite",
+      "name": "Test suite",
+      "description": ""
+    },
+    {
+      "id": "route",
+      "name": "Application route",
+      "description": ""
+    },
+    {
+      "id": "friction",
+      "name": "Synthetic friction candidate",
+      "description": ""
+    },
+    {
+      "id": "autofix-plan",
+      "name": "Congruence fix plan",
+      "description": ""
+    }
+  ],
+  "routes": [
+    {
+      "path": "/",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/design-system",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/events",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/events/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/issues",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/issues/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/journeys",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/journeys/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/journeys/maps/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/journeys/new",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/ontology",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/operator",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal",
+      "source": "client/src/components/PersonalTopHeader.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/:rest*",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/projects/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/projects/:id/issues",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/projects/:id/runs",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/projects/:id/settings",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/projects/:id/suites",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/projects/:id/tests",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/projects/:id/toolbox",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/settings",
+      "source": "client/src/components/PersonalTopHeader.tsx",
+      "observed": false
+    },
+    {
+      "path": "/personal/toolbox",
+      "source": "client/src/components/PersonalTopHeader.tsx",
+      "observed": false
+    },
+    {
+      "path": "/runs",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/runs/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/runs/initializing/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/runs/live/autonomous",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/runs/live/deterministic",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/settings",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/suites",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/suites/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/suites/new",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/suites/runs/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/tests",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/tests/:id",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/tests/new/autonomous",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/tests/new/deterministic",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/tools",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/usage",
+      "source": "client/src/App.tsx",
+      "observed": false
+    },
+    {
+      "path": "/ux",
+      "source": "client/src/components/Sidebar.tsx",
+      "observed": false
+    },
+    {
+      "path": "/workspaces/new",
+      "source": "client/src/App.tsx",
+      "observed": false
+    }
+  ],
+  "relations": [
+    {
+      "from": "workspace-owner",
+      "to": "journey",
+      "type": "uses"
+    },
+    {
+      "from": "synthetic-browser",
+      "to": "run",
+      "type": "produces"
+    },
+    {
+      "from": "journey",
+      "to": "run",
+      "type": "produces"
+    },
+    {
+      "from": "run",
+      "to": "issue",
+      "type": "produces"
+    },
+    {
+      "from": "run",
+      "to": "friction",
+      "type": "produces"
+    },
+    {
+      "from": "autofix-plan",
+      "to": "issue",
+      "type": "depends-on"
+    }
+  ]
+}

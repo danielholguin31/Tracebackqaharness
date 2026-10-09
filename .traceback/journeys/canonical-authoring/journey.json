@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "canonical-authoring",
+  "name": "Author a canonical user journey",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/journeys/new",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Create a draft journey with a meaningful expected outcome. Save it, open its definition, and verify the saved fields and revision. Use a temporary QA-prefixed ID.",
+  "expectedOutcome": "The saved journey can be read from its detail view with the intended expected outcome.",
+  "routes": [
+    "/journeys",
+    "/journeys/new",
+    "/journeys/:id"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

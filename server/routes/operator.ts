@@ -6,6 +6,10 @@ import { openai, sseEvent } from '../lib/openai';
 import { executeRun } from '../lib/runner';
 import { uid, now, parseJson, WORKSPACE_ID, OWNER_ID } from '../lib/helpers';
 import type OpenAI from 'openai';
+import { tracebackStore } from '../lib/traceback-store';
+import { searchTraceback,journeyAnalysis,runJourney } from '../lib/journey-services';
+import { prepareAutofix } from '../lib/journey-github';
+import { OPEN_GEN_UI_DESIGN_SKILL } from '../../client/src/vendor/open-intelligent-ui/design-system';
 
 export const operatorRouter = Router();
 
@@ -51,6 +55,11 @@ const TOOL_THINKING: Record<string, (args: Record<string, unknown>) => string> =
 // ─── Operator Tools definition ────────────────────────────
 
 const OPERATOR_TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
+  {type:'function',function:{name:'search_canonical_journeys',description:'Search canonical .traceback definitions, ontology, and real run/issue evidence. Prefer this for user journeys.',parameters:{type:'object',properties:{query:{type:'string'}},required:['query']}}},
+  {type:'function',function:{name:'get_canonical_journey',description:'Read a canonical journey and its current revision. .traceback is the source of truth.',parameters:{type:'object',properties:{id:{type:'string'}},required:['id']}}},
+  {type:'function',function:{name:'analyze_canonical_journey',description:'Read actual synthetic UX findings, run evidence and stale revision flags. Never infer human satisfaction or conversion.',parameters:{type:'object',properties:{id:{type:'string'}},required:['id']}}},
+  {type:'function',function:{name:'run_canonical_journey',description:'Run a saved canonical journey with Steel only when the user asks to execute it.',parameters:{type:'object',properties:{id:{type:'string'},persona:{type:'string',enum:['standard','first-time','mobile','keyboard']},budget:{type:'number'}},required:['id']}}},
+  {type:'function',function:{name:'prepare_congruence_fix',description:'Prepare an autofix plan for an observed canonical journey failure. The Congruence adapter is not configured; this does not edit code or create a PR.',parameters:{type:'object',properties:{runId:{type:'string'}},required:['runId']}}},
   // ── Read tools ──────────────────────────────────────────
   {
     type: 'function',
@@ -562,12 +571,12 @@ Always call list_tests first to find relevant test IDs to include.`,
     type: 'function',
     function: {
       name: 'show_custom_component',
-      description: `Render a custom HTML component using only Tailwind CSS and the design system. Use when none of the other chart/card types fit the visualization you need. Build tables, timelines, status boards, diff views, or any bespoke layout. Rules: only use Tailwind utility classes, design-system CSS variables (bg-muted, text-foreground, text-accent, border-border, bg-accent, text-muted-foreground, bg-primary, text-primary-foreground), and inline SVG. No external libraries. Keep it self-contained.`,
+      description: `Render an isolated OpenIntelligentUI HTML artifact for real evidence. Use native HTML, inline SVG, and inline styles with --color-background-primary, --color-text-primary, --color-text-secondary, --color-border-primary and semantic theme variables. Forms and SVG helpers are pre-styled. Tailwind and external libraries are not loaded. Local scripts can use sendPrompt(text) and openLink(httpsUrl); host actions require a user click. Never invent evidence.`,
       parameters: {
         type: 'object',
         properties: {
           title: { type: 'string', description: 'Card header label' },
-          html: { type: 'string', description: 'Self-contained HTML with Tailwind classes. Must render correctly when placed inside a padded white card.' },
+          html: { type: 'string', description: 'Self-contained HTML for the isolated OpenIntelligentUI artifact. Use theme CSS variables; no host DOM or external network access.' },
         },
         required: ['title', 'html'],
         additionalProperties: false,
@@ -612,6 +621,11 @@ interface ToolResult {
 
 async function executeTool(name: string, args: Record<string, unknown>): Promise<ToolResult> {
   switch (name) {
+    case 'search_canonical_journeys': return {result:await searchTraceback(String(args.query||''))};
+    case 'get_canonical_journey': return {result:await tracebackStore.get(String(args.id))};
+    case 'analyze_canonical_journey': return {result:await journeyAnalysis(String(args.id))};
+    case 'run_canonical_journey': return {result:await runJourney(String(args.id),{persona:args.persona||'standard',budget:args.budget||50})};
+    case 'prepare_congruence_fix': return {result:await prepareAutofix(String(args.runId))};
 
     case 'list_tests': {
       const rows = await db.select().from(schema.tests).where(eq(schema.tests.archived, false));
@@ -1009,7 +1023,7 @@ Always prefer showing data visually over describing it in text. Pick the right v
 
 **Other:**
 - show_test_matrix → test × environment/run status dot grid
-- show_custom_component → fully custom HTML/Tailwind component when no other type fits. Use this for tables, timelines, status boards, diff views — anything bespoke. Only Tailwind + design system CSS vars allowed.
+- show_custom_component: isolated OpenIntelligentUI artifact for evidence tables, timelines, status boards, and diff views. Use native HTML and the injected theme CSS variables. Tailwind and external dependencies are not loaded.
 
 If the user asks about trends, distribution, or comparisons — reach for a chart. Don't just list numbers in text when a sparkline or bar chart would say it better.
 
@@ -1284,6 +1298,7 @@ operatorRouter.post('/sessions/:sessionId/messages', async (req: Request, res: R
   const historyWithoutLast = allHistory.slice(0, -1);
 
   const oaiMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    {role:'system',content:`.traceback is the canonical source for journeys and ontology. Use canonical tools for journey questions. Synthetic profiles are not real users. Cite actual run IDs and evidence. Static routes and link maps are candidates, not complete business coverage. Never change expected outcomes to conceal failures. Congruence autofix is planned, not an available repair execution service. Custom HTML is rendered in an isolated OpenIntelligentUI-derived document with no network access. ${OPEN_GEN_UI_DESIGN_SKILL}`},
     { role: 'system', content: buildSystemPrompt({ ...settings, autonomyPreset: overrideAutonomy || settings.autonomyPreset }) },
     ...historyWithoutLast,
     // Inject page contexts as system messages right before the current user turn — never stored in DB

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "issue-triage",
+  "name": "Review and classify a product failure",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/issues",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Open an observed issue, review reproduction evidence and screenshots, and inspect its available export integrations. Do not publish tickets during this journey.",
+  "expectedOutcome": "The selected issue identifies its actual failing run and external integrations report their availability honestly.",
+  "routes": [
+    "/issues",
+    "/issues/:id"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

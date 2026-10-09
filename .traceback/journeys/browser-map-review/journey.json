@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "browser-map-review",
+  "name": "Map and review an application",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/journeys",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Start a bounded map of an explicitly configured disposable application. Review observed page screenshots and remaining URLs. Import the observations only as draft checks.",
+  "expectedOutcome": "Observed routes and draft checks are distinguishable from verified business coverage.",
+  "routes": [
+    "/journeys",
+    "/journeys/maps/:id",
+    "/ontology"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}

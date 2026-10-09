@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "test-authoring",
+  "name": "Define a repeatable browser test",
+  "description": "",
+  "entryPoint": "http://host.docker.internal:3001/tests/new/deterministic",
+  "actor": "workspace-owner",
+  "mode": "autonomous",
+  "goal": "Create a deterministic test for a disposable application with an explicit assertion. Save it and verify the definition retains URL, steps, viewport, and budget.",
+  "expectedOutcome": "The persisted test retains all execution fields without starting an unintended run.",
+  "routes": [
+    "/tests/new/deterministic",
+    "/tests",
+    "/tests/:id"
+  ],
+  "tags": [
+    "traceback-self-qa"
+  ],
+  "steps": [],
+  "status": "draft",
+  "provenance": {
+    "kind": "authored"
+  },
+  "revision": 1
+}
